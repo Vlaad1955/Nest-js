@@ -42,7 +42,7 @@ export class ReturnUserDto {
 
     @ApiProperty()
     createdAt: Date;
-};
+}
 
 
 export class CreateUserDto extends ReturnUserDto {

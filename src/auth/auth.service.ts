@@ -17,12 +17,12 @@ export class AuthService {
         this.userRepository.create({ ...createAuthDto, password }),
     );
     return {
-      id:createAuthDto.id,
-      firstName:createAuthDto.firstName,
-      lastName:createAuthDto.lastName,
-      age:createAuthDto.age,
-      city:createAuthDto.city,
-      createdAt:createAuthDto.createdAt,
+      id:user.id,
+      firstName:user.firstName,
+      lastName:user.lastName,
+      age:user.age,
+      city:user.city,
+      createdAt:user.createdAt,
     };
   }
 
