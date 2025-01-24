@@ -22,6 +22,9 @@ export class Post extends BaseEntity{
     @Column('text', { nullable: true })
     body?: string;
 
+    @Column('text', { nullable: true })
+    comment:string;
+
     @Column()
     user_id: string;
 
