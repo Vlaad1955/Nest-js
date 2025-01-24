@@ -13,8 +13,6 @@ export class ReturnUserDto {
     @ApiProperty()
     id: string;
 
-
-
     @IsOptional()
     @IsString()
     @ApiProperty({ required: false })

@@ -15,33 +15,68 @@ export class UserService {
       private readonly userRepository: Repository<User>,
   ) {}
 
-  async findAll(query?: BaseQueryDto): Promise<{
-    pages: number | undefined;
-    entities: UserItemDto[];
-    countItems: number | undefined;
-    page: number
-  }> {
+  async findAll(query?: BaseQueryDto): Promise<{ pages: number | undefined; entities: UserItemDto[]; countItems: number | undefined; page: number }> {
     const options = {
       page: query && query.page !== undefined ? +query.page : 1,
       limit: query && query.limit !== undefined ? +query.limit : 10,
     };
 
-    const queryBuilder = this.userRepository.createQueryBuilder('user');
-    queryBuilder.select('email, "firstName", age, id, "createdAt"');
+    const queryBuilder = this.userRepository.createQueryBuilder('user')
+        .leftJoinAndSelect('user.post', 'post'); ;
+    queryBuilder.select([
+      'user.email',
+      'user.firstName',
+      'user.age',
+      'user.id',
+      'user.createdAt',
+      'post.id AS post_id',
+      'post.title AS post_title',
+      'post.description AS post_description',
+    ]);
+
     if (query?.search) {
       queryBuilder.where('LOWER(user.firstName) LIKE :search', {
         search: `%${query.search.toLowerCase()}%`,
       });
     }
+
+    const countItems = await this.userRepository.count();
+
     const [pagination, rawEntities] = await paginateRawAndEntities(
         queryBuilder,
         options,
     );
+
+    const usersMap = new Map();
+    rawEntities.forEach((entity: any) => {
+      const userId = entity.user_id;
+      if (!usersMap.has(userId)) {
+        usersMap.set(userId, {
+          email: entity.user_email,
+          firstName: entity.user_firstName,
+          age: entity.user_age,
+          id: entity.user_id,
+          createdAt: entity.user_createdAt,
+          posts: [],
+        });
+      }
+
+      if (entity.post_id) {
+        usersMap.get(userId).posts.push({
+          post_id: entity.post_id,
+          post_title: entity.post_title,
+          post_description: entity.post_description,
+        });
+      }
+    });
+
+    const users = Array.from(usersMap.values());
+
     return {
       page: pagination.meta.currentPage,
       pages: pagination.meta.totalPages,
-      countItems: pagination.meta.totalItems,
-      entities: rawEntities as UserItemDto[],
+      countItems: countItems,
+      entities: users,
     };
   }
 
