@@ -26,19 +26,35 @@ export class PostService {
     }
   }
 
-  findAll() {
-    return `This action returns all post`;
+  async update(id: string, updatePostDto: PostDto) {
+    try {
+      const post = await this.postRepository.findOne({where: {id}});
+
+      if (!post) {
+        throw new Error('Post not found');
+      }
+
+      await this.postRepository.update({id}, updatePostDto);
+      return 'Post updated successfully';
+    }catch (e) {
+      this.logger.error(e);
+      throw new BadRequestException('Update post failed.');
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} post`;
-  }
+  async remove(id: string): Promise<string> {
+    try {
+      const post = await this.postRepository.findOne({where: {id}});
 
-  update(id: number,) {
-    return `This action updates a #${id} post`;
-  }
+      if (!post) {
+        throw new Error('Post not found');
+      }
 
-  remove(id: number) {
-    return `This action removes a #${id} post`;
+      await this.postRepository.delete({id});
+      return 'Post deleted successfully';
+    } catch (e){
+      this.logger.error(e);
+      throw new BadRequestException('Delete post failed.');
+    }
   }
 }
