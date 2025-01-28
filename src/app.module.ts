@@ -7,9 +7,14 @@ import {DatabaseModule} from "./database/database.module";
 import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
 import configuration from "./common/config/configuration";
+import {RedisModule} from "@webeleon/nestjs-redis";
 
 @Module({
-  imports: [AuthModule, ConfigModule.forRoot({
+  imports: [
+      RedisModule.forRoot({
+        url:`redis://localhost:6379`,
+      }),
+      AuthModule, ConfigModule.forRoot({
     load: [configuration],
     isGlobal: true,
   }), DatabaseModule, UserModule, PostModule,],

@@ -23,6 +23,9 @@ export class User extends BaseEntity {
     @Column('text', { nullable: true, default: 'Lviv' })
     city: string;
 
+    @Column('text', {  default: 'User' })
+    role: string;
+
     @Column('integer', { nullable: true })
     age: number;
 
